@@ -9,6 +9,5 @@ import Uploader from "../uploader/index.vue";
 <style>
 #app {
   text-align: center;
-  margin-top: 60px;
 }
 </style>

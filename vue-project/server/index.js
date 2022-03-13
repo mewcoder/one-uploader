@@ -14,7 +14,7 @@ const router = new Router();
 
 router.post('/api/upload', async (ctx) => {
 
-  console.log('receive upload');
+  console.log('receive...');
   const form = new multiparty.Form({
     uploadDir: 'temp'
   });
@@ -22,9 +22,8 @@ router.post('/api/upload', async (ctx) => {
   form.parse(ctx.req)
 
   form.on('file', (name, file) => {
-    console.log(name, file);
+    console.log('save:', name);
   })
-
   ctx.response.body = '上传成功';
 
 })
