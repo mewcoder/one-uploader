@@ -6,6 +6,12 @@
       <button class="el-button" @click="handleUpload">上传</button>
       <button class="el-button" @click="handleAbort">取消</button>
     </div>
+    <div style="margin-top: 30px">
+      <span>分块单位：{{ chunkSize / 1024 }}KB；</span>
+      <span>文件大小：{{ Math.round(fileSize / 1024) }}KB；</span>
+      <span>分块总数：{{ chunkCount }}；</span>
+      <span>当前上传分块：{{ index }}</span>
+    </div>
     <el-progress
       style="width: 60%; margin: auto; margin-top: 20px"
       :text-inside="true"
@@ -17,18 +23,20 @@
 
 <script setup>
 import { ElMessage, ElProgress } from "element-plus";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import axios from "axios";
 
 defineProps({
   msg: String,
 });
 
-const chunkSize = 1024 * 200; // 分配大小
+const chunkSize = 1024 * 200; // 分块大小
 
 const index = ref(0); // 当前分块id
 
 const chunkCount = ref(0); // 分块总数
+
+const fileSize = ref(0);
 
 const start = computed(() => {
   return chunkSize * index.value; // 当前分块开始位置 byte
@@ -39,8 +47,11 @@ const process = ref(0); // 当前进度
 const handleUpload = () => {
   const file = document.getElementById("up").files[0];
 
-  if (!file) return;
-
+  if (!file) {
+    ElMessage.warning("请选择文件");
+    return;
+  }
+  fileSize.value = file.size;
   chunkCount.value = Math.ceil(file.size / chunkSize);
   let startByte = start.value;
   console.log("startByte:", startByte);
@@ -49,6 +60,9 @@ const handleUpload = () => {
     ElMessage.success("上传完成");
     console.log("上传完成");
     index.value = 0;
+    chunkCount.value = 0;
+    fileSize.value = 0;
+    document.getElementById("up").value = "";
     return;
   }
 
@@ -68,7 +82,7 @@ const handleUpload = () => {
     .then(() => {
       // ElMessage.info(`上传成功: ${blobName}`);
       index.value++;
-      setTimeout(handleUpload, 1000);
+      setTimeout(handleUpload);
       // handleUpload();
     })
     .catch((err) => {
