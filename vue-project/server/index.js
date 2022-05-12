@@ -6,11 +6,12 @@ const Router = require('koa-router');
 
 const multiparty = require('multiparty');
 
-
+const bodyParser = require('koa-bodyparser');
 
 const app = new Koa();
 const router = new Router();
 
+app.use(bodyParser())
 
 router.post('/api/upload', async (ctx) => {
 
@@ -28,7 +29,19 @@ router.post('/api/upload', async (ctx) => {
 
 })
 
+
+router.get('/api/getTest', async (ctx) => {
+  ctx.response.body = '成功';
+})
+
+router.post('/api/postTest', async (ctx) => {
+  console.log(ctx.request.body);
+  ctx.response.body = '上传成功';
+})
+
 app.use(router.routes())
+
+
 
 app.listen(4000, () => {
   console.log('server is running at port 4000');
